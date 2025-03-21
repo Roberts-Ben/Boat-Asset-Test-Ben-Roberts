@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerController: MonoBehaviour
 {
-    public float acceleration = 10f;
+    public float acceleration = 5f;
     public float turnForce = 0.2f;
     public float deceleration = 1f;
 
@@ -29,7 +29,7 @@ public class PlayerController: MonoBehaviour
         // Apply torque for rotation
         if (horizontalnput != 0)
         {
-            rb.AddTorque(transform.up * horizontalnput * turnForce, ForceMode.Acceleration);
+            rb.AddTorque(transform.up * horizontalnput * (turnForce * rb.velocity.magnitude / acceleration), ForceMode.Acceleration);
         }
 
         // Apply drag
