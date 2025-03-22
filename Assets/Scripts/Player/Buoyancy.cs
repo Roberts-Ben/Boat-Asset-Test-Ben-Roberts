@@ -1,13 +1,9 @@
-using Unity.VisualScripting;
 using UnityEngine;
 using System.Collections.Generic;
 
 public class Buoyancy : MonoBehaviour
 {
     public List<Transform> floatPoints = new();
-
-    public float waterResistance = 0.5f;
-    public float waterAngluarDrag = 1f;
 
     public float buoyancy = 400f;
     public float waterHeight = 0f;
@@ -23,6 +19,8 @@ public class Buoyancy : MonoBehaviour
     {
         foreach(Transform point in floatPoints) // See how much of our boat is below the surface
         {
+            if (point == null) continue;
+
             float diff = point.position.y - waterHeight;
 
             if (diff < 0)

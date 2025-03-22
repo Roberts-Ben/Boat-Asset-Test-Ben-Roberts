@@ -19,29 +19,26 @@ public class PlayerController: MonoBehaviour
     void FixedUpdate()
     {
         float forwardInput = Input.GetAxis("Vertical");
-        float horizontalnput = Input.GetAxis("Horizontal");
+        float horizontalInput = Input.GetAxis("Horizontal");
 
         // Apply force for acceleration
         if (forwardInput != 0)
         {
             rb.AddForce(transform.forward * forwardInput * acceleration, ForceMode.Acceleration);
         }
+
         // Apply torque for rotation
-        if (horizontalnput != 0)
+        if (horizontalInput != 0)
         {
-            rb.AddTorque(transform.up * horizontalnput * (turnForce * rb.velocity.magnitude / acceleration), ForceMode.Acceleration);
+            rb.AddTorque(transform.up * horizontalInput * (turnForce * rb.velocity.magnitude / acceleration), ForceMode.Acceleration);
         }
 
         // Apply drag
-        if (rb.velocity.magnitude > 0.1f)
+        if (forwardInput == 0)
         {
             rb.AddForce(-rb.velocity.normalized * deceleration, ForceMode.Acceleration);
         }
 
-        // Cap speed
-        if (rb.velocity.magnitude > maxSpeed)
-        {
-            rb.velocity = rb.velocity.normalized * maxSpeed;
-        }
+        rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed);
     }
 }

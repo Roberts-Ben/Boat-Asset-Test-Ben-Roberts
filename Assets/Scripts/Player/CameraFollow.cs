@@ -10,9 +10,16 @@ public class CameraFollow : MonoBehaviour
 
     void FixedUpdate()
     {
-        Vector3 targetPosition = target.TransformPoint(cameraOffset);
+        if (target == null)
+        {
+            Debug.LogWarning("No camera target");
+            return;
+        }
 
+        Vector3 targetPosition = target.TransformPoint(cameraOffset);
         transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
-        transform.LookAt(target.position);
+
+        Quaternion targetRotation = Quaternion.LookRotation(target.position - transform.position);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, smoothTime);
     }
 }
