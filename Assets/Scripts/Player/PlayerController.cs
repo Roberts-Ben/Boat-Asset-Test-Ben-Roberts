@@ -10,6 +10,9 @@ public class PlayerController: MonoBehaviour
     public float turnForce = 0.5f;
     public float turnSpeedMult = 0.1f;
 
+    public float baseDrag = 0.1f;
+    public float maxDrag = 3f;
+
     private Rigidbody rb;
     public Transform enginePosition;
 
@@ -36,12 +39,7 @@ public class PlayerController: MonoBehaviour
         }
 
         // Apply drag
-        if (forwardInput == 0)
-        {
-            rb.AddForce(-rb.velocity.normalized * deceleration, ForceMode.Acceleration);
-        }
-
-        rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed);
+        ApplyWaterResistance();
     }
 
     private void ApplyForwardForce(float forwardInput)
@@ -56,5 +54,19 @@ public class PlayerController: MonoBehaviour
         //rb.AddTorque(transform.up * horizontalInput * (turnForce * rb.velocity.magnitude / acceleration), ForceMode.Acceleration);
         float turnSpeed = Mathf.Clamp(rb.velocity.magnitude * turnSpeedMult, 0.5f, maxTurnSpeed);
         rb.AddTorque(transform.up * horizontalInput * turnForce * turnSpeed, ForceMode.Acceleration);
+    }
+
+    private void ApplyWaterResistance()
+    {
+        if (rb.velocity.magnitude > 0.1f) // Only apply resistance if moving
+        {
+            float speedFactor = rb.velocity.magnitude / maxSpeed;
+            float dragForce = Mathf.Lerp(baseDrag, maxDrag, speedFactor); // More drag at higher speeds
+
+            Vector3 resistanceForce = -rb.velocity.normalized * dragForce;
+
+            //rb.AddForce(-rb.velocity.normalized * deceleration, ForceMode.Acceleration);
+            rb.AddForce(resistanceForce, ForceMode.Force);
+        }
     }
 }
