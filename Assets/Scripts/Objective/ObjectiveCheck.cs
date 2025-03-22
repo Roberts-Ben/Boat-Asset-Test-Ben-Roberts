@@ -24,16 +24,22 @@ public class ObjectiveCheck : MonoBehaviour
     {
         if (!UIManager.instance.gameEnded && insideObjective)
         {
-            bool objectiveMet = positionedCorrectly & orientedCorrectly;
+            bool objectiveMet = positionedCorrectly && orientedCorrectly;
 
-            UIManager.instance.InsideObjective(objectiveMet);
             UIManager.instance.InsideObjective(objectiveMet);
         }
     }
 
     private void OnTriggerStay(Collider other)
     {
-        CheckPosition();
+        if (playerShip != null)
+        {
+            CheckPosition();
+        }
+        else
+        {
+            Debug.LogWarning("Player ship not found by " + transform.name);
+        }
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -43,7 +49,7 @@ public class ObjectiveCheck : MonoBehaviour
     private void OnTriggerExit(Collider other)
     {
         insideObjective = false;
-        ToggleNotifications(false);
+        ForceSetNotificationState(false);
     }
 
     private void CheckPosition()
@@ -51,23 +57,23 @@ public class ObjectiveCheck : MonoBehaviour
         positionedCorrectly = Vector3.Distance(playerShip.position, objective.position) < positionTolerance; // Ensure the player is close enough to the dock
 
         float angle = Vector3.SignedAngle(playerShip.forward, objective.forward, Vector3.up);
-        orientedCorrectly = angle >= -rotationTolerance && angle <= rotationTolerance; // Ensure they are facing the right way
+        orientedCorrectly = Mathf.Abs(angle) <= rotationTolerance; // Ensure they are facing the right way
 
         notificationTimer += Time.deltaTime;
         if (notificationTimer >= 1f)
         {
             notificationTimer = 0f;
-            ToggleNotifications();
+            ToggleNotificationState();
         } 
     }
 
-    private void ToggleNotifications()
+    private void ToggleNotificationState()
     {
         UIManager.instance.tooFarNotif.SetActive(!positionedCorrectly);
         UIManager.instance.wrongOrientationNotif.SetActive(!orientedCorrectly);
     }
 
-    private void ToggleNotifications(bool isEnabled) // Used to force notifications on or off instantly when entering or leaving the trigger
+    private void ForceSetNotificationState(bool isEnabled) // Used to force notifications on or off instantly when entering or leaving the trigger
     {
         UIManager.instance.tooFarNotif.SetActive(isEnabled);
         UIManager.instance.wrongOrientationNotif.SetActive(isEnabled);

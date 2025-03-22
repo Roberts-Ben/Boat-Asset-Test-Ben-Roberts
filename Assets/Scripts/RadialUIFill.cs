@@ -18,10 +18,7 @@ public class RadialUIFill : MonoBehaviour
 
             if(currentFill >= 1f)
             {
-                if(!UIManager.instance.gameEnded)
-                {
-                    UIManager.instance.EndGame();
-                }
+                 UIManager.instance.EndGame();
             }
         }
     }
@@ -29,5 +26,6 @@ public class RadialUIFill : MonoBehaviour
     public void ResetProgress()
     {
         currentFill = 0;
+        progress.value = 0f;
     }
 }
