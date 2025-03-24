@@ -459,11 +459,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c172e724a13f65d4ea1c248ebc88cce2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: 5
-  turnForce: 0.2
-  deceleration: 1
   maxSpeed: 20
-  maxTurnSpeed: 1
+  acceleration: 500
+  deceleration: 0.98
+  maxTurnSpeed: 2.5
+  turnForce: 0.5
+  turnSpeedMult: 0.1
+  baseDrag: 0.1
+  maxDrag: 3
+  enginePosition: {fileID: 6609674959398277234}
 --- !u!114 &488707258
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -481,8 +485,6 @@ MonoBehaviour:
   - {fileID: 610192138}
   - {fileID: 1532740760}
   - {fileID: 257988764}
-  waterResistance: 0.5
-  waterAngluarDrag: 1
   buoyancy: 400
   waterHeight: 0
 --- !u!1 &4644909266151047505

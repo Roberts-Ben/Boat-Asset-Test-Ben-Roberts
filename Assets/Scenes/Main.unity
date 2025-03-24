@@ -3825,6 +3825,21 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2085905969135774975, guid: 0b2c1d2c8d9196d48bf2d483ba158c71,
+        type: 3}
+      propertyPath: routes.Array.data[0]
+      value: 
+      objectReference: {fileID: 1581716940}
+    - target: {fileID: 2085905969135774975, guid: 0b2c1d2c8d9196d48bf2d483ba158c71,
+        type: 3}
+      propertyPath: routes.Array.data[1]
+      value: 
+      objectReference: {fileID: 482396497}
+    - target: {fileID: 2085905969135774975, guid: 0b2c1d2c8d9196d48bf2d483ba158c71,
+        type: 3}
+      propertyPath: routes.Array.data[2]
+      value: 
+      objectReference: {fileID: 253963486}
     - target: {fileID: 3886961369789978623, guid: 0b2c1d2c8d9196d48bf2d483ba158c71,
         type: 3}
       propertyPath: m_RootOrder

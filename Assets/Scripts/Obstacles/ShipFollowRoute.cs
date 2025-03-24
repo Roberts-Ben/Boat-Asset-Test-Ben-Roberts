@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class ShipFollowRoute : MonoBehaviour
 {
@@ -12,6 +13,18 @@ public class ShipFollowRoute : MonoBehaviour
     private float progress = 0;
 
     private Vector3 waypointPos;
+
+    public float maxSpeed = 200f;
+    public float acceleration = 200f;
+    public float maxTurnSpeed = 1f;
+    public float turnForce = 0.5f;
+
+    private Rigidbody rb;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 
     void FixedUpdate()
     {
@@ -28,8 +41,18 @@ public class ShipFollowRoute : MonoBehaviour
             * Mathf.Pow(1 - progress, 2) * progress * p1 + 3
             * (1 - progress) * Mathf.Pow(progress, 2) * p2 + Mathf.Pow(progress, 3) * p3;
 
-        transform.LookAt(waypointPos);
-        transform.position = waypointPos;
+        Vector3 direction = waypointPos - transform.position;
+        var localTarget = transform.InverseTransformPoint(waypointPos);
+
+        float angle = Mathf.Atan2(localTarget.x, localTarget.z) * Mathf.Rad2Deg;
+
+        Vector3 eulerAngleVelocity = new (0, angle, 0);
+        Quaternion deltaRotation = Quaternion.Euler(eulerAngleVelocity * turnForce * Time.deltaTime);
+        
+        rb.MoveRotation(rb.rotation * deltaRotation);
+        rb.AddForce(direction * acceleration, ForceMode.Force);
+        //transform.LookAt(waypointPos);
+        //transform.position = waypointPos;
 
         if (progress >= 1)
         {
