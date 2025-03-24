@@ -1,17 +1,21 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
-    public static UIManager instance;
+    public static UIManager instance { get; private set; }
 
-    public GameObject endGameScreen;
-    public GameObject objectiveTimer;
-    public GameObject tooFarNotif;
-    public GameObject wrongOrientationNotif;
+    [SerializeField] private GameObject endGameScreen;
+    [SerializeField] private GameObject objectiveTimer;
+    [SerializeField] private GameObject inRangeNotif;
+    [SerializeField] private GameObject correctOrientationNotif;
+    [SerializeField] private GameObject progressUI;
+    [SerializeField] private Slider progress;
 
-    public bool gameEnded = false;
+    [SerializeField] private float timeToCompleteObjective;
 
-    public RadialUIFill objectiveRadialUI;
+    private float currentFill;
+    private bool objectiveMet;
 
     private void Awake()
     {
@@ -19,31 +23,56 @@ public class UIManager : MonoBehaviour
         {
             instance = this;
         }
-        else if (instance != this)
+        else
         {
             Destroy(gameObject);
         }
     }
+    void Update()
+    {
+        if (objectiveMet)
+        {
+            currentFill += (1f / timeToCompleteObjective) * Time.deltaTime;
+            progress.value = currentFill;
+
+            if (currentFill >= 1f)
+            {
+                EndGame();
+            }
+        }
+    }
+
+    public void ResetProgress()
+    {
+        currentFill = 0;
+        progress.value = 0f;
+    }
 
     public void EndGame()
     {
-        gameEnded = true;
         endGameScreen.SetActive(true);
         objectiveTimer.SetActive(false);
     }
-    public void ToggleEndGameScreen(bool active)
+
+    public void ToggleEndGameScreen(bool isActive)
     {
-        endGameScreen.SetActive(active);
+        endGameScreen.SetActive(isActive);
     }
 
-    public void InsideObjective(bool insideObjective)
+    public void InsideObjective(bool isInside)
     {
-        objectiveTimer.SetActive(insideObjective);
-        objectiveRadialUI.ObjectiveMet = insideObjective;
+        objectiveTimer.SetActive(isInside);
+        objectiveMet = isInside;
 
-        if(!insideObjective)
+        if(!isInside)
         {
-            objectiveRadialUI.ResetProgress();
+            ResetProgress();
         }
+    }
+
+    public void UpdateNotifications(bool inRange, bool correctOrientation)
+    {
+        inRangeNotif.SetActive(inRange);
+        correctOrientationNotif.SetActive(correctOrientation);
     }
 }

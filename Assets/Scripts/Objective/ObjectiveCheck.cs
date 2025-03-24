@@ -1,81 +1,76 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class ObjectiveCheck : MonoBehaviour
 {
-    private Transform objective;
+    [SerializeField] private Transform objective;
+    [SerializeField] private float positionTolerance = 2f;
+    [SerializeField] private float rotationTolerance = 10f;
+
     private Transform playerShip;
 
-    private bool positionedCorrectly = false;
-    private bool orientedCorrectly = false;
-    private bool insideObjective = false;
+    private bool positionedCorrectly;
+    private bool orientedCorrectly;
+    private bool prevPositionState;
+    private bool prevOrientationState;
 
-    public float positionTolerance = 2f;
-    public float rotationTolerance = 10f;
-
-    private float notificationTimer = 0f;
+    private bool stateChanged;
 
     private void Awake()
     {
-        objective = transform;
+        objective = this.transform;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
-        if (!UIManager.instance.gameEnded && insideObjective)
-        {
-            bool objectiveMet = positionedCorrectly && orientedCorrectly;
+        bool objectiveMet = positionedCorrectly && orientedCorrectly;
 
+        if (stateChanged)
+        {
             UIManager.instance.InsideObjective(objectiveMet);
         }
     }
-
     private void OnTriggerStay(Collider other)
     {
-        if (playerShip != null)
+        if (other.CompareTag("Player"))
         {
-            CheckPosition();
-        }
-        else
-        {
-            Debug.LogWarning("Player ship not found by " + transform.name);
+            CheckPositionAndOrientation();
         }
     }
     private void OnTriggerEnter(Collider other)
     {
-        playerShip = other.transform;
-        insideObjective = true;
+        if (other.CompareTag("Player"))
+        {
+            playerShip = other.transform;
+            UIManager.instance.UpdateNotifications(false, false);
+            CheckPositionAndOrientation();
+        }
     }
+
     private void OnTriggerExit(Collider other)
     {
-        insideObjective = false;
-        ForceSetNotificationState(false);
+        if (other.CompareTag("Player"))
+        {
+            UIManager.instance.UpdateNotifications(false, false); // Reset notifications
+        }
     }
 
-    private void CheckPosition()
+    private void CheckPositionAndOrientation()
     {
-        positionedCorrectly = Vector3.Distance(playerShip.position, objective.position) < positionTolerance; // Ensure the player is close enough to the dock
+        if (playerShip == null)
+        {
+            return;
+        }
+
+        prevPositionState = positionedCorrectly;
+        prevOrientationState = orientedCorrectly;
+
+        float distance = Vector3.Distance(playerShip.position, objective.position);
+        positionedCorrectly = distance < positionTolerance;
 
         float angle = Vector3.SignedAngle(playerShip.forward, objective.forward, Vector3.up);
-        orientedCorrectly = Mathf.Abs(angle) <= rotationTolerance; // Ensure they are facing the right way
+        orientedCorrectly = Mathf.Abs(angle) <= rotationTolerance;
 
-        notificationTimer += Time.deltaTime;
-        if (notificationTimer >= 1f)
-        {
-            notificationTimer = 0f;
-            ToggleNotificationState();
-        } 
-    }
-
-    private void ToggleNotificationState()
-    {
-        UIManager.instance.tooFarNotif.SetActive(!positionedCorrectly);
-        UIManager.instance.wrongOrientationNotif.SetActive(!orientedCorrectly);
-    }
-
-    private void ForceSetNotificationState(bool isEnabled) // Used to force notifications on or off instantly when entering or leaving the trigger
-    {
-        UIManager.instance.tooFarNotif.SetActive(isEnabled);
-        UIManager.instance.wrongOrientationNotif.SetActive(isEnabled);
+        stateChanged = (prevPositionState != positionedCorrectly || prevOrientationState != orientedCorrectly);
+        UIManager.instance.UpdateNotifications(!positionedCorrectly, !orientedCorrectly);
     }
 }

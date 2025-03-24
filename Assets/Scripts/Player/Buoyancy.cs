@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 public class Buoyancy : MonoBehaviour
 {
-    public List<Transform> floatPoints = new();
+    [SerializeField] private List<Transform> floatPoints = new();
 
-    public float buoyancy = 400f;
-    public float waterHeight = 0f;
+    [SerializeField] private float buoyancy = 400f;
+    [SerializeField] private float waterHeight = 0f;
 
     private Rigidbody rb;
 

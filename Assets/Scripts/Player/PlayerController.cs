@@ -2,16 +2,17 @@ using UnityEngine;
 
 public class PlayerController: MonoBehaviour
 {
-    public float maxSpeed = 20f;
-    public float acceleration = 500f;
-    public float deceleration = 0.98f;
+    [SerializeField] private float maxSpeed = 20f;
+    [SerializeField] private float acceleration = 500f;
 
-    public float maxTurnSpeed = 2.5f;
-    public float turnForce = 0.5f;
-    public float turnSpeedMult = 0.1f;
+    [SerializeField] private float maxTurnSpeed = 2.5f;
+    [SerializeField] private float turnForce = 0.5f;
+    [SerializeField] private float turnSpeedMult = 0.1f;
 
-    public float baseDrag = 0.1f;
-    public float maxDrag = 3f;
+    [SerializeField] private float bankForce = 5f;
+
+    [SerializeField] private float baseDrag = 10f;
+    [SerializeField] private float maxDrag = 2f;
 
     private Rigidbody rb;
     public Transform enginePosition;
@@ -38,22 +39,32 @@ public class PlayerController: MonoBehaviour
             ApplyTurningForce(horizontalInput);
         }
 
+        ApplyTiltEffect(horizontalInput);
+
         // Apply drag
         ApplyWaterResistance();
     }
 
     private void ApplyForwardForce(float forwardInput)
     {
-        //rb.AddForce(transform.forward * forwardInput * acceleration, ForceMode.Acceleration); 
         Vector3 forceDirection = transform.forward * forwardInput * acceleration;
         rb.AddForceAtPosition(forceDirection, enginePosition.position, ForceMode.Force);
     }
 
     private void ApplyTurningForce(float horizontalInput)
     {
-        //rb.AddTorque(transform.up * horizontalInput * (turnForce * rb.velocity.magnitude / acceleration), ForceMode.Acceleration);
         float turnSpeed = Mathf.Clamp(rb.velocity.magnitude * turnSpeedMult, 0.5f, maxTurnSpeed);
         rb.AddTorque(transform.up * horizontalInput * turnForce * turnSpeed, ForceMode.Acceleration);
+    }
+
+    private void ApplyTiltEffect(float horizontalInput)
+    {
+        //rb.AddTorque(transform.forward * horizontalInput * bankForce, ForceMode.Acceleration);
+        float tiltForce = horizontalInput * bankForce * rb.velocity.magnitude / maxSpeed;
+        rb.AddTorque(transform.forward * tiltForce, ForceMode.Acceleration);
+
+        Vector3 stabilizationTorque = -rb.angularVelocity.z * Vector3.forward * 2f;
+        rb.AddTorque(stabilizationTorque, ForceMode.Acceleration);
     }
 
     private void ApplyWaterResistance()
@@ -64,8 +75,6 @@ public class PlayerController: MonoBehaviour
             float dragForce = Mathf.Lerp(baseDrag, maxDrag, speedFactor); // More drag at higher speeds
 
             Vector3 resistanceForce = -rb.velocity.normalized * dragForce;
-
-            //rb.AddForce(-rb.velocity.normalized * deceleration, ForceMode.Acceleration);
             rb.AddForce(resistanceForce, ForceMode.Force);
         }
     }

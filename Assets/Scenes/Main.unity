@@ -3354,7 +3354,7 @@ GameObject:
   - component: {fileID: 1079100825}
   - component: {fileID: 1079100824}
   m_Layer: 5
-  m_Name: Too Far Notification
+  m_Name: In Range Notification
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4505,7 +4505,7 @@ GameObject:
   - component: {fileID: 1522344212}
   - component: {fileID: 1522344211}
   m_Layer: 5
-  m_Name: Wrong Orientation Notification
+  m_Name: Correct Orientation Notification
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4973,10 +4973,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   endGameScreen: {fileID: 797861550}
   objectiveTimer: {fileID: 2146853808}
-  tooFarNotif: {fileID: 1079100822}
-  wrongOrientationNotif: {fileID: 1522344209}
-  gameEnded: 0
-  objectiveRadialUI: {fileID: 2146853810}
+  inRangeNotif: {fileID: 1079100822}
+  correctOrientationNotif: {fileID: 1522344209}
+  progressUI: {fileID: 2146853808}
+  progress: {fileID: 1739088475}
+  timeToCompleteObjective: 3
 --- !u!114 &1590201053
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6718,7 +6719,6 @@ GameObject:
   - component: {fileID: 2146853809}
   - component: {fileID: 2146853812}
   - component: {fileID: 2146853811}
-  - component: {fileID: 2146853810}
   m_Layer: 5
   m_Name: Objective Timer
   m_TagString: Untagged
@@ -6747,20 +6747,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 200}
   m_SizeDelta: {x: 800, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2146853810
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2146853808}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee35e6754b5d7b74b930624c6070bcbd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  timeToFill: 3
-  progress: {fileID: 1739088475}
 --- !u!114 &2146853811
 MonoBehaviour:
   m_ObjectHideFlags: 0

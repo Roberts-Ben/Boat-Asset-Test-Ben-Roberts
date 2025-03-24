@@ -3,22 +3,24 @@ using UnityEngine;
 
 public class ShipFollowRoute : MonoBehaviour
 {
-    public List<Route> routes;
+    [SerializeField] private List<Route> routes;
+    [SerializeField] private List<float> timeToTraverseRoutes; // Allows certain legs to be faster than others, or to normalise travel time
 
-    private int activeRoute = 0;
-    public List<float> timeToTraverseRoutes;
-
-    private float timePassed = 0;
-    private float progress = 0;
-
+    private float timePassed;
+    private float progress;
     private Vector3 waypointPos;
 
-    public int startingRoute = 0;
-    public float startingProgress = 0f;
+    private int activeRoute = 0;
+    [SerializeField] private int startingRoute;
+    [SerializeField] private float startingProgress;
 
-    public float acceleration = 200f;
-    public float maxTurnSpeed = 1f;
-    public float turnForce = 0.5f;
+    [SerializeField] private float acceleration = 200f;
+    [SerializeField] private float turnForce = 0.5f;
+
+    private Vector3 p0;
+    private Vector3 p1;
+    private Vector3 p2;
+    private Vector3 p3;
 
     private Rigidbody rb;
 
@@ -27,38 +29,24 @@ public class ShipFollowRoute : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         activeRoute = startingRoute;
         timePassed = startingProgress;
+
+        ProcessCurrentRoute();
     }
 
     void FixedUpdate()
     {
-        Route currentRoute = routes[activeRoute];
-
         if (routes.Count == 0 || activeRoute >= routes.Count || routes[activeRoute].waypoints.Count < 4)
         {
-            Debug.LogWarning("Invalid route data:" + activeRoute);
+            Debug.LogWarning("Invalid route data: " + activeRoute);
             return;
         }
 
-        Vector3 p0 = currentRoute.waypoints[0].position;
-        Vector3 p1 = currentRoute.waypoints[1].position;
-        Vector3 p2 = currentRoute.waypoints[2].position;
-        Vector3 p3 = currentRoute.waypoints[3].position;
-
         timePassed += Time.deltaTime;
-        progress = Mathf.Clamp01(timePassed / timeToTraverseRoutes[activeRoute]);
-
-        // Target is the next step of the curve
+        progress = Mathf.Clamp01(timePassed / timeToTraverseRoutes[activeRoute]); // Step through the current curve and set the next destination
         waypointPos = Route.CalculateBezierCurvePoint(progress, p0, p1, p2, p3);
 
-        Vector3 direction = waypointPos - transform.position;
-
-        var localTarget = transform.InverseTransformPoint(waypointPos);
-        float angle = Mathf.Atan2(localTarget.x, localTarget.z) * Mathf.Rad2Deg;
-        Vector3 eulerAngleVelocity = new (0, angle, 0);
-        Quaternion deltaRotation = Quaternion.Euler(eulerAngleVelocity * turnForce * Time.deltaTime);
-        
-        rb.MoveRotation(rb.rotation * deltaRotation);
-        rb.AddForce(direction * acceleration, ForceMode.Force);
+        ApplyForwardForce();
+        ApplyTurningForce();
 
         if (progress >= 1)
         {
@@ -69,6 +57,36 @@ public class ShipFollowRoute : MonoBehaviour
             {
                 activeRoute = 0;
             }
+            ProcessCurrentRoute();
         }
+    }
+
+    /// <summary>
+    /// Grabs the current route nodes as the route is started
+    /// </summary>
+    public void ProcessCurrentRoute()
+    {
+        Route currentRoute = routes[activeRoute];
+
+        p0 = currentRoute.waypoints[0].position;
+        p1 = currentRoute.waypoints[1].position;
+        p2 = currentRoute.waypoints[2].position;
+        p3 = currentRoute.waypoints[3].position;
+    }
+
+    public void ApplyForwardForce()
+    {
+        Vector3 direction = waypointPos - transform.position;
+        rb.AddForce(direction * acceleration, ForceMode.Force);
+    }
+
+    public void ApplyTurningForce()
+    {
+        var localTarget = transform.InverseTransformPoint(waypointPos);
+        float angle = Mathf.Atan2(localTarget.x, localTarget.z) * Mathf.Rad2Deg;
+        Vector3 eulerAngleVelocity = new(0, angle, 0);
+        Quaternion deltaRotation = Quaternion.Euler(eulerAngleVelocity * turnForce * Time.deltaTime);
+
+        rb.MoveRotation(rb.rotation * deltaRotation);
     }
 }
