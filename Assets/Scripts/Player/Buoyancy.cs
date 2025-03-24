@@ -6,7 +6,7 @@ public class Buoyancy : MonoBehaviour
     [SerializeField] private List<Transform> floatPoints = new();
 
     [SerializeField] private float buoyancy = 400f;
-    [SerializeField] private float waterHeight = 0f;
+    [SerializeField] private float waterHeightAtPoint = 0f;
 
     private Rigidbody rb;
 
@@ -21,7 +21,9 @@ public class Buoyancy : MonoBehaviour
         {
             if (point == null) continue;
 
-            float diff = point.position.y - waterHeight;
+            waterHeightAtPoint = Waves.instance.GetWaveHeight(point.transform.position.x, point.transform.position.z);
+
+            float diff = point.position.y - waterHeightAtPoint;
 
             if (diff < 0)
             {
