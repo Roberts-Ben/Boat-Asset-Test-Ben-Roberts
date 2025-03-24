@@ -1,20 +1,21 @@
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class ShipFollowRoute : MonoBehaviour
 {
     public List<Route> routes;
 
     private int activeRoute = 0;
-    public float timeToTraverseRoute = 60f;
+    public List<float> timeToTraverseRoutes;
 
     private float timePassed = 0;
     private float progress = 0;
 
     private Vector3 waypointPos;
 
-    public float maxSpeed = 200f;
+    public int startingRoute = 0;
+    public float startingProgress = 0f;
+
     public float acceleration = 200f;
     public float maxTurnSpeed = 1f;
     public float turnForce = 0.5f;
@@ -24,6 +25,8 @@ public class ShipFollowRoute : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        activeRoute = startingRoute;
+        timePassed = startingProgress;
     }
 
     void FixedUpdate()
@@ -41,24 +44,21 @@ public class ShipFollowRoute : MonoBehaviour
         Vector3 p2 = currentRoute.waypoints[2].position;
         Vector3 p3 = currentRoute.waypoints[3].position;
 
-        timePassed += (1f / timeToTraverseRoute) * Time.deltaTime; // Slowly progress through the current route
-        progress = timePassed % timeToTraverseRoute;
+        timePassed += Time.deltaTime;
+        progress = Mathf.Clamp01(timePassed / timeToTraverseRoutes[activeRoute]);
 
         // Target is the next step of the curve
         waypointPos = Route.CalculateBezierCurvePoint(progress, p0, p1, p2, p3);
 
         Vector3 direction = waypointPos - transform.position;
+
         var localTarget = transform.InverseTransformPoint(waypointPos);
-
         float angle = Mathf.Atan2(localTarget.x, localTarget.z) * Mathf.Rad2Deg;
-
         Vector3 eulerAngleVelocity = new (0, angle, 0);
         Quaternion deltaRotation = Quaternion.Euler(eulerAngleVelocity * turnForce * Time.deltaTime);
         
         rb.MoveRotation(rb.rotation * deltaRotation);
         rb.AddForce(direction * acceleration, ForceMode.Force);
-        //transform.LookAt(waypointPos);
-        //transform.position = waypointPos;
 
         if (progress >= 1)
         {
