@@ -2,14 +2,19 @@ using UnityEngine;
 
 public class PlayerController: MonoBehaviour
 {
-    public float acceleration = 5f;
-    public float turnForce = 0.2f;
-    public float deceleration = 1f;
-
     public float maxSpeed = 20f;
-    public float maxTurnSpeed = 1f;
+    public float acceleration = 500f;
+    public float deceleration = 0.98f;
+
+    public float maxTurnSpeed = 2.5f;
+    public float turnForce = 0.5f;
+    public float turnSpeedMult = 0.1f;
+
+    public float baseDrag = 0.1f;
+    public float maxDrag = 3f;
 
     private Rigidbody rb;
+    public Transform enginePosition;
 
     void Awake()
     {
@@ -19,29 +24,49 @@ public class PlayerController: MonoBehaviour
     void FixedUpdate()
     {
         float forwardInput = Input.GetAxis("Vertical");
-        float horizontalnput = Input.GetAxis("Horizontal");
+        float horizontalInput = Input.GetAxis("Horizontal");
 
         // Apply force for acceleration
         if (forwardInput != 0)
         {
-            rb.AddForce(transform.forward * forwardInput * acceleration, ForceMode.Acceleration);
+            ApplyForwardForce(forwardInput);
         }
+
         // Apply torque for rotation
-        if (horizontalnput != 0)
+        if (horizontalInput != 0)
         {
-            rb.AddTorque(transform.up * horizontalnput * (turnForce * rb.velocity.magnitude / acceleration), ForceMode.Acceleration);
+            ApplyTurningForce(horizontalInput);
         }
 
         // Apply drag
-        if (rb.velocity.magnitude > 0.1f)
-        {
-            rb.AddForce(-rb.velocity.normalized * deceleration, ForceMode.Acceleration);
-        }
+        ApplyWaterResistance();
+    }
 
-        // Cap speed
-        if (rb.velocity.magnitude > maxSpeed)
+    private void ApplyForwardForce(float forwardInput)
+    {
+        //rb.AddForce(transform.forward * forwardInput * acceleration, ForceMode.Acceleration); 
+        Vector3 forceDirection = transform.forward * forwardInput * acceleration;
+        rb.AddForceAtPosition(forceDirection, enginePosition.position, ForceMode.Force);
+    }
+
+    private void ApplyTurningForce(float horizontalInput)
+    {
+        //rb.AddTorque(transform.up * horizontalInput * (turnForce * rb.velocity.magnitude / acceleration), ForceMode.Acceleration);
+        float turnSpeed = Mathf.Clamp(rb.velocity.magnitude * turnSpeedMult, 0.5f, maxTurnSpeed);
+        rb.AddTorque(transform.up * horizontalInput * turnForce * turnSpeed, ForceMode.Acceleration);
+    }
+
+    private void ApplyWaterResistance()
+    {
+        if (rb.velocity.magnitude > 0.1f) // Only apply resistance if moving
         {
-            rb.velocity = rb.velocity.normalized * maxSpeed;
+            float speedFactor = rb.velocity.magnitude / maxSpeed;
+            float dragForce = Mathf.Lerp(baseDrag, maxDrag, speedFactor); // More drag at higher speeds
+
+            Vector3 resistanceForce = -rb.velocity.normalized * dragForce;
+
+            //rb.AddForce(-rb.velocity.normalized * deceleration, ForceMode.Acceleration);
+            rb.AddForce(resistanceForce, ForceMode.Force);
         }
     }
 }
