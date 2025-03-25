@@ -14,6 +14,9 @@ public class PlayerController: MonoBehaviour
     [SerializeField] private float baseDrag = 10f;
     [SerializeField] private float maxDrag = 2f;
 
+    private bool canFlip;
+    private bool previousCanFlip;
+
     private Rigidbody rb;
     public Transform enginePosition;
 
@@ -43,6 +46,17 @@ public class PlayerController: MonoBehaviour
 
         // Apply drag
         ApplyWaterResistance();
+
+        CheckIfShipUpsideDown();
+
+    }
+
+    private void Update()
+    {
+        if (canFlip && Input.GetKeyDown(KeyCode.F))
+        {
+            transform.localEulerAngles = new Vector3(0f, 0f, 0f);
+        }
     }
 
     private void ApplyForwardForce(float forwardInput)
@@ -77,5 +91,16 @@ public class PlayerController: MonoBehaviour
             Vector3 resistanceForce = -rb.velocity.normalized * dragForce;
             rb.AddForce(resistanceForce, ForceMode.Force);
         }
+    }
+    private void CheckIfShipUpsideDown()
+    {
+        canFlip = Vector3.Dot(transform.up, Vector3.up) < -0.66f;
+
+        if (canFlip != previousCanFlip)
+        {
+            UIManager.instance.UpdateFlipNotification(canFlip);
+        }
+
+        previousCanFlip = canFlip;
     }
 }

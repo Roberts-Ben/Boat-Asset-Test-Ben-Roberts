@@ -7,10 +7,11 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private GameObject endGameScreen;
     [SerializeField] private GameObject objectiveTimer;
-    [SerializeField] private GameObject inRangeNotif;
-    [SerializeField] private GameObject correctOrientationNotif;
+    [SerializeField] private Image inRangeNotif;
+    [SerializeField] private Image correctOrientationNotif;
     [SerializeField] private GameObject progressUI;
     [SerializeField] private Slider progress;
+    [SerializeField] private GameObject flipNotif;
 
     [SerializeField] private float timeToCompleteObjective;
 
@@ -72,7 +73,12 @@ public class UIManager : MonoBehaviour
 
     public void UpdateNotifications(bool inRange, bool correctOrientation)
     {
-        inRangeNotif.SetActive(inRange);
-        correctOrientationNotif.SetActive(correctOrientation);
+        inRangeNotif.color = inRange ? Color.red : Color.green;
+        correctOrientationNotif.color = correctOrientation ? Color.red : Color.green;
+    }
+
+    public void UpdateFlipNotification(bool showHint)
+    {
+        flipNotif.SetActive(showHint);
     }
 }
