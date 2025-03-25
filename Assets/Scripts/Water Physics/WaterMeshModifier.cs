@@ -19,7 +19,7 @@ public class WaterMeshModifier : MonoBehaviour
 
         for (int i = 0; i < vertices.Length; i++)
         {
-            float newY = Waves.instance.GetWaveHeight(vertices[i].x, vertices[i].z);
+            float newY = Waves.instance.GetWaveHeight(vertices[i].x, vertices[i].z); // Recalculate vertex height at each position
             newVertices[i] = new Vector3(vertices[i].x, newY, vertices[i].z);
         }
 

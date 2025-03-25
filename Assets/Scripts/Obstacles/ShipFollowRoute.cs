@@ -11,12 +11,14 @@ public class ShipFollowRoute : MonoBehaviour
     private Vector3 waypointPos;
 
     private int activeRoute = 0;
+    // Initialise based on where the ship starts in relation to it's assigned route. N.B ship doesn't snap to that location so it would instead move towards that assigned location until it reaches it
     [SerializeField] private int startingRoute;
     [SerializeField] private float startingProgress;
 
     [SerializeField] private float acceleration = 200f;
     [SerializeField] private float turnForce = 0.5f;
 
+    // The 4 points of each curve on the current route
     private Vector3 p0;
     private Vector3 p1;
     private Vector3 p2;
@@ -76,17 +78,19 @@ public class ShipFollowRoute : MonoBehaviour
 
     public void ApplyForwardForce()
     {
+        // Move towards the current target
         Vector3 direction = waypointPos - transform.position;
         rb.AddForce(direction * acceleration, ForceMode.Force);
     }
 
     public void ApplyTurningForce()
     {
+        // Sets desired angle to rotate towards
         var localTarget = transform.InverseTransformPoint(waypointPos);
         float angle = Mathf.Atan2(localTarget.x, localTarget.z) * Mathf.Rad2Deg;
         Vector3 eulerAngleVelocity = new(0, angle, 0);
         Quaternion deltaRotation = Quaternion.Euler(eulerAngleVelocity * turnForce * Time.deltaTime);
 
-        rb.MoveRotation(rb.rotation * deltaRotation);
+        rb.MoveRotation(rb.rotation * deltaRotation); // Avoiding torque approach to keep the ship tighter to the curve
     }
 }

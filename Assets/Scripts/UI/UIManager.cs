@@ -7,15 +7,17 @@ public class UIManager : MonoBehaviour
     public static UIManager instance { get; private set; }
 
     [SerializeField] private GameObject endGameScreen;
-    [SerializeField] private GameObject objectiveTimer;
-    [SerializeField] private Image inRangeNotif;
-    [SerializeField] private Image correctOrientationNotif;
-    [SerializeField] private GameObject progressUI;
-    [SerializeField] private Slider progress;
-    [SerializeField] private GameObject flipNotif;
     [SerializeField] private GameObject pauseMenu;
 
+    [SerializeField] private GameObject objectiveTimer;
+    [SerializeField] private GameObject progressUI;
+    [SerializeField] private Slider progress;
     [SerializeField] private float timeToCompleteObjective;
+
+    [SerializeField] private Image inRangeNotif;
+    [SerializeField] private Image correctOrientationNotif;
+    
+    [SerializeField] private GameObject flipNotif;
 
     private float currentFill;
     private bool objectiveMet;
@@ -42,7 +44,7 @@ public class UIManager : MonoBehaviour
         if (objectiveMet)
         {
             currentFill += (1f / timeToCompleteObjective) * Time.deltaTime;
-            progress.value = currentFill;
+            progress.value = currentFill; // Using a slider as a radial fill. Increment as long as objective conditions are met
 
             if (currentFill >= 1f)
             {

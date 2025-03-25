@@ -10,7 +10,7 @@ public class ObjectiveCheck : MonoBehaviour
 
     private bool positionedCorrectly;
     private bool orientedCorrectly;
-    private bool prevPositionState;
+    private bool prevPositionState; // Used to check for state changes so that we only update the UI when it's needed, not every frame
     private bool prevOrientationState;
 
     private bool stateChanged;
@@ -26,7 +26,7 @@ public class ObjectiveCheck : MonoBehaviour
 
         if (stateChanged)
         {
-            UIManager.instance.InsideObjective(objectiveMet);
+            UIManager.instance.InsideObjective(objectiveMet); // Trigger the final timer once both conditions are met
         }
     }
     private void OnTriggerStay(Collider other)
@@ -41,7 +41,6 @@ public class ObjectiveCheck : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerShip = other.transform;
-            UIManager.instance.UpdateNotifications(false, false);
             CheckPositionAndOrientation();
         }
     }
@@ -64,13 +63,19 @@ public class ObjectiveCheck : MonoBehaviour
         prevPositionState = positionedCorrectly;
         prevOrientationState = orientedCorrectly;
 
+        // Distance check from the center of the objective
         float distance = Vector3.Distance(playerShip.position, objective.position);
         positionedCorrectly = distance < positionTolerance;
 
+        // Orientation check between boat and objective forward (positive Z axis)
         float angle = Vector3.SignedAngle(playerShip.forward, objective.forward, Vector3.up);
         orientedCorrectly = Mathf.Abs(angle) <= rotationTolerance;
 
         stateChanged = (prevPositionState != positionedCorrectly || prevOrientationState != orientedCorrectly);
-        UIManager.instance.UpdateNotifications(!positionedCorrectly, !orientedCorrectly);
+
+        if (stateChanged)
+        {
+            UIManager.instance.UpdateNotifications(!positionedCorrectly, !orientedCorrectly);
+        }
     }
 }

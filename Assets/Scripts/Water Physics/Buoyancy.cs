@@ -21,13 +21,13 @@ public class Buoyancy : MonoBehaviour
         {
             if (point == null) continue;
 
-            waterHeightAtPoint = Waves.instance.GetWaveHeight(point.transform.position.x, point.transform.position.z);
+            waterHeightAtPoint = Waves.instance.GetWaveHeight(point.transform.position.x, point.transform.position.z); // Get the simulated wave height at this location
 
             float diff = point.position.y - waterHeightAtPoint;
 
             if (diff < 0)
             {
-                rb.AddForceAtPosition(Vector3.up * buoyancy * Mathf.Abs(diff), point.position, ForceMode.Force); // Push that point back up
+                rb.AddForceAtPosition(Vector3.up * buoyancy * Mathf.Abs(diff), point.position, ForceMode.Force); // Push that point back up, based on how far under it is
             }
         }
     }

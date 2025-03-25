@@ -17,6 +17,7 @@ public class Route : MonoBehaviour
 
         for (int i = 0; i < waypoints.Count; i++)
         {
+            // Visuals for each of the 4 nodes
             Gizmos.color = Color.yellow;
             Gizmos.DrawCube(waypoints[i].position, Vector3.one);
         }
