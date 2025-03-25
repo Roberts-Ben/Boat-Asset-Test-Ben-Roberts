@@ -1,3 +1,4 @@
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,11 +13,13 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject progressUI;
     [SerializeField] private Slider progress;
     [SerializeField] private GameObject flipNotif;
+    [SerializeField] private GameObject pauseMenu;
 
     [SerializeField] private float timeToCompleteObjective;
 
     private float currentFill;
     private bool objectiveMet;
+    private bool paused;
 
     private void Awake()
     {
@@ -31,6 +34,11 @@ public class UIManager : MonoBehaviour
     }
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            paused = !paused;
+            pauseMenu.SetActive(paused);
+        }
         if (objectiveMet)
         {
             currentFill += (1f / timeToCompleteObjective) * Time.deltaTime;
@@ -53,6 +61,17 @@ public class UIManager : MonoBehaviour
     {
         endGameScreen.SetActive(true);
         objectiveTimer.SetActive(false);
+    }
+
+    public void Quit()
+    {
+        Application.Quit();
+    }
+
+    public void Cancel()
+    {
+        paused = false;
+        pauseMenu.SetActive(paused);
     }
 
     public void ToggleEndGameScreen(bool isActive)
